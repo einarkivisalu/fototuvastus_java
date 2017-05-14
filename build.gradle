@@ -1,0 +1,60 @@
+buildscript {
+    ext {
+        springBootVersion = '1.5.1.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+
+jar {
+    baseName = 'fototuvastus'
+    version = '0.0.1-SNAPSHOT'
+}
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+repositories {
+    flatDir {
+        dirs 'libs'
+    }
+}
+
+task zip(type: Zip) {
+    from('build/libs') {
+        include '*.jar'
+    }
+    from('.') {
+        include 'appspec.yml'
+        include 'fototuvastus.exe'
+        include 'fototuvastus.xml'
+    }
+    from('.') {
+        include 'scripts/*'
+        include 'bin/images/*'
+        include 'bin/cascades/*'
+        include 'bin/opencv/*'
+    }
+}
+
+dependencies {
+    compile name: 'opencv-320'
+    compile 'org.springframework.boot:spring-boot-starter-web'
+    compile 'com.google.code.gson:gson:2.2.4'
+    compile 'io.springfox:springfox-swagger2:2.6.1'
+    compile 'io.springfox:springfox-swagger-ui:2.6.1'
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile('junit:junit:4.12')
+}

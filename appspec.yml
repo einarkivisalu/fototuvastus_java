@@ -1,0 +1,12 @@
+version: 0.0
+os: windows
+files:
+  - source: ./
+    destination: /fototuvastus
+hooks:
+  ApplicationStop:
+    - location: scripts/stop_server.bat
+  ApplicationStart:
+    - location: scripts/start_server.bat
+      timeout: 500
+      runas: root

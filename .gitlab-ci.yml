@@ -1,0 +1,48 @@
+stages:
+  - clean
+  - build
+  - test
+  - deploy
+
+before_script:
+#  - echo `pwd` # debug
+#  - echo "$CI_BUILD_NAME, $CI_BUILD_REF_NAME $CI_BUILD_STAGE" # debug
+#  - export GRADLE_USER_HOME=`pwd`/gradle
+#  - echo %JAVA_HOME%
+#  - echo %PATH%
+
+
+clean:
+  stage: clean
+  script:
+    - ./gradlew clean
+  only:
+    - master
+
+build:
+  stage: build
+  script:
+    - ./gradlew assemble
+  only:
+    - master
+
+test:
+  stage: test
+  script:
+    - ./gradlew test
+  only:
+    - master
+
+deploy:
+  # Script to run for deploying application to AWS
+  script:
+    #- ./gradlew build # # Build the project with Gradle
+    - ./gradlew assemble
+    - ./gradlew zip  # creates distribution zip for deployment
+    - aws s3 cp build/distributions/fototuvastus.zip $AWS_S3_LOCATION --region eu-central-1 --metadata '{"application-name":"Fototuvastus-Dev", "deploymentgroup-name":"Fototuvastus-Dev-Deploy"}' # Uploads the zipfile to S3 and expects the AWS Code Pipeline/Code Deploy to pick up
+    #- ./gradlew copyFiles
+    #- aws deploy push --application-name Fototuvastus-App --s3-location $AWS_S3_LOCATION --source build/distributions
+    - aws deploy create-deployment --ignore-application-stop-failures --application-name Fototuvastus-App --s3-location bucket=fototuvastus-codepipeline-deployment,key=fototuvastus.zip,bundleType=zip --deployment-group-name Fototuvastus-Deployment-Group --deployment-config-name CodeDeployDefault.OneAtATime
+  stage: deploy
+  only:
+    - master

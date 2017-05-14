@@ -1,0 +1,1 @@
+C:\\fototuvastus\fototuvastus.exe install
